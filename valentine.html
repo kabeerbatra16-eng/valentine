@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Be My Valentine 💖</title>
+
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #ffd1dc, #ff9acb);
+    overflow: hidden;
+    text-align: center;
+  }
+
+  h1 {
+    color: #ff1493;
+    margin-top: 30px;
+  }
+
+  .container {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* FLOATING HEARTS */
+  .heart {
+    position: fixed;
+    bottom: -20px;
+    pointer-events: none;
+    animation: floatUp 6s linear forwards;
+  }
+
+  @keyframes floatUp {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(-110vh); opacity: 0; }
+  }
+
+  .sad-area img {
+    width: 220px;
+  border-radius: 15px;
+  margin: 20px auto 10px auto;
+  display: block;
+}
+
+  .sad-text {
+    font-size: 18px;
+    color: #c2185b;
+    margin: 15px;
+  }
+
+  button {
+    padding: 15px 35px;
+    font-size: 18px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    margin: 10px;
+    transition: all 0.4s ease;
+  }
+
+  #yesBtn {
+    background: #ff1493;
+    color: white;
+  }
+
+  #noBtn {
+    background: #ffd1dc;
+  }
+
+  /* POPUP */
+  .popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,182,193,0.95);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 5;
+  }
+
+  .popup img {
+    width: 320px;
+    border-radius: 20px;
+  }
+
+  /* FADE-IN FINAL MESSAGE */
+  .fade-in {
+    opacity: 0;
+    animation: fadeInText 2s ease forwards;
+  }
+
+  @keyframes fadeInText {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .popup p {
+    font-size: 22px;
+    color: #ff007f;
+    margin-top: 20px;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Will you be my Valentine? 💘</h1>
+
+  <div class="sad-area">
+    <img id="sadImg" style="display:none;">
+    <div id="sadText" class="sad-text"></div>
+  </div>
+
+  <button id="yesBtn">YES 💖</button>
+  <button id="noBtn">NO 💔</button>
+</div>
+
+<!-- FINAL POPUP -->
+<div class="popup" id="popup">
+  <img src="us.jpg">
+  <p id="finalMessage" class="fade-in">
+    You are the greatest gift of my life, Thank you for being my forever Valentine babygirl💕
+  </p>
+  <audio id="song" src="song.mp3"></audio>
+</div>
+
+<audio id="kissSound" src="kiss.mp3"></audio>
+<audio id="celebrateSound" src="celebration.mp3"></audio>
+
+<!-- CONFETTI LIBRARY -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn = document.getElementById("noBtn");
+  const sadImg = document.getElementById("sadImg");
+  const sadText = document.getElementById("sadText");
+  const popup = document.getElementById("popup");
+  const song = document.getElementById("song");
+  const kissSound = document.getElementById("kissSound");
+  const celebrateSound = document.getElementById("celebrateSound");
+  const finalMessage = document.getElementById("finalMessage");
+
+  let noClicks = 0;
+
+  const sadImages = [
+    "sad1.jpg",
+    "sad2.jpg",
+    "sad3.jpg",
+    "sad4.jpg",
+    "sad5.jpg"
+  ];
+
+  const sadMessages = [
+    "WOWWW !!!! Yeh baat hogayi ab, OUCH😢",
+    "Damn, Second time. 8 years and you're breaking my heart like this 💔",
+    "3rd time toh charm hota hain 🥺",
+    "Ab toh main bahut hi sad hun 😭",
+    "Accha ok, Last chance 😞"
+  ];
+
+  /* NO CLICK LOGIC */
+  noBtn.onclick = () => {
+    if (noClicks < 5) {
+      sadImg.style.display = "block";
+      sadImg.src = sadImages[noClicks];
+      sadText.innerText = sadMessages[noClicks];
+
+      noBtn.style.transform = `scale(${1 - noClicks * 0.15})`;
+      yesBtn.style.transform = `scale(${1 + noClicks * 0.2})`;
+
+      noClicks++;
+
+      if (noClicks === 5) {
+        noBtn.style.display = "none";
+        yesBtn.style.transform = "scale(3)";
+      }
+    }
+  };
+
+  /* KISS SOUND */
+  yesBtn.onmouseenter = () => {
+    kissSound.currentTime = 0;
+    kissSound.play();
+  };
+
+  /* YES CLICK */
+  yesBtn.onclick = () => {
+    popup.style.display = "flex";
+
+    song.play();
+    celebrateSound.play();
+
+    /* restart fade animation cleanly */
+    finalMessage.classList.remove("fade-in");
+    void finalMessage.offsetWidth;
+    finalMessage.classList.add("fade-in");
+
+    for (let i = 0; i < 3; i++) {
+      setTimeout(() => {
+        confetti({
+          particleCount: 150,
+          spread: 120,
+          startVelocity: 45,
+          gravity: 0.9,
+          scalar: 1.2,
+          colors: ['#ff69b4','#ff1493','#ffc0cb','#ffe4e1'],
+          origin: { x: Math.random(), y: 0.6 }
+        });
+      }, i * 300);
+    }
+  };
+
+  /* FLOATING HEARTS LOOP */
+  setInterval(() => {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.innerHTML = "💖";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.fontSize = Math.random() * 25 + 15 + "px";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 6000);
+  }, 350);
+</script>
+
+</body>
+</html>
